@@ -1,9 +1,9 @@
- # encoding: utf-8
+# encoding: utf-8
 
+import os
 import sys
-from workflow import Workflow, ICON_WEB, web
-from urllib import quote
-
+import json
+from workflow import Workflow, web
 
 icon_mapping = {
     "Java": "images/icons/java.png",
@@ -14,66 +14,100 @@ icon_mapping = {
 }
 
 
-def get_posts(query):
-    url = "https://sourcegraph.com/.api/global-search?Query=%s&Limit=15" % query.replace(' ' , '+')
-
-    request = web.get(url)
-
-    # throw an error if request failed
-    # Workflow will catch this and show it to the user
-    request.raise_for_status()
-
-    # Parse the JSON returned by pinboard and extract the posts
-    result = request.json()
-    posts = result['Defs']
-    return posts
-
 def main(wf):
+    try:
+        sourcegraph_url = os.environ['sourcegraph_url'].rstrip('/')
+        api_token = os.environ['api_token']
+    except KeyError as missing_config:
+        sys.stderr.write('Missing required config: {}'.format(missing_config.args[0]))
+        sys.exit(1)
 
     if wf.args and len(wf.args) > 1:
-        searchtype = wf.args[0]
         query = wf.args[1]
 
-        searchtype = "info" if searchtype == 'i' else "def"
+        url = "{}/.api/graphql?SearchSuggestions".format(sourcegraph_url)
+        body = """
+             query SearchSuggestions($query: String!) {
+                 search(query: $query) {
+                     suggestions(first: 20) {
+                         __typename
+                         ... on Repository {
+                             name
+                             url
+                         }
+                         ... on File {
+                             path
+                             url
+                             repository {
+                                 name
+                             }
+                         }
+                     }
+                 }
+             }
+         """
+        variables = {
+            'query': query
+        }
+        request = web.post(url,
+                           data=json.dumps({'query': body, 'variables': variables}),
+                           headers={'Authorization': 'token {}'.format(api_token)})
 
-        posts = get_posts(query)
+        # throw an error if request failed
+        # Workflow will catch this and show it to the user
+        request.raise_for_status()
+
+        # Parse the JSON returned
+        result = request.json()
+        # sys.stderr.write(json.dumps(result, indent=2))
+        try:
+            suggestions = result['data']['search']['suggestions']
+        except KeyError:
+            sys.stderr.write(str(result['errors']))
+            raise
 
         wf.clear_data()
 
-        if not posts:
+        if not suggestions:
             wf.add_item(title="No results found for \"%s\"" % query,
-                        subtitle = "",
+                        subtitle="",
                         valid=False,
                         icon='images/sourcegraph-mark.png')
             wf.send_feedback()
             return
-        for post in posts:
+        repo_count = file_count = 0
+        for item in suggestions:
             try:
-                arg = post['Repo']
-
-                # for packages, the entire file path does not need to be generated
-                if post['File'] != "" and post['File'] != "." and post['Kind'] != "package":
-                    arg += "/-/%s/%s/%s/-/%s" % (searchtype, post['UnitType'], post['Unit'], post['Path'])
-
-                icon = "images/icons/doc-code.png"
-                if post['FmtStrings']['Language'] in icon_mapping:
-                    icon = icon_mapping[post['FmtStrings']['Language']]
-                title = post['FmtStrings']['Name']['ScopeQualified']
-                subtitle = "from %s" % post['FmtStrings']['Name']['LanguageWideQualified']
-                wf.add_item(title=title,
-                            subtitle=subtitle,
-                            arg= arg,
-                            valid=True,
-                            icon=icon)
+                if item['__typename'] in 'Repository' and repo_count < 5:
+                    arg = item['url']
+                    title = item['name']
+                    icon = "images/icons/doc-code.png"
+                    repo_count += 1
+                    wf.add_item(title=title,
+                                arg=arg,
+                                valid=True,
+                                icon=icon)
+                elif item['__typename'] in 'File' and file_count < 5:
+                    arg = item['url']
+                    title = item['path']
+                    subtitle = 'from {}'.format(item['repository']['name'])
+                    icon = "images/icons/doc-code.png"
+                    file_count += 1
+                    wf.add_item(title=title,
+                                subtitle=subtitle,
+                                arg=arg,
+                                valid=True,
+                                icon=icon)
             except Exception as e:
                 sys.stderr.write(str(e))
         # Send the results to Alfred as XML
         wf.send_feedback()
-        
+
+
 if __name__ == u"__main__":
 
     update_settings = {
-        'github_slug': 'sourcegraph/sourcegraph-alfred',
+        'github_slug': 'jklewa/sourcegraph-alfred',
         'frequency': 1
     }
 

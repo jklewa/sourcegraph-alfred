@@ -89,7 +89,7 @@
 	</array>
 	<key>readme</key>
 	<string>Sourcegraph: https://sourcegraph.com/
-GitHub: https://github.com/sourcegraph/sourcegraph-alfred</string>
+GitHub: https://github.com/jklewa/sourcegraph-alfred</string>
 	<key>uidata</key>
 	<dict>
 		<key>64F20F2B-A336-4CE8-8B23-36C9A5F9E68D</key>
