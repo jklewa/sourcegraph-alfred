@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>com.sourcegraph.alfred</string>
+	<string>com.sourcegraph.alfred.jklewa</string>
 	<key>category</key>
-	<string>Productivity</string>
+	<string>Tools</string>
 	<key>connections</key>
 	<dict>
 		<key>B7B7DA0B-84D0-4DC3-A7FA-153AFA3B7860</key>
@@ -17,11 +17,13 @@
 				<integer>0</integer>
 				<key>modifiersubtext</key>
 				<string></string>
+				<key>vitoclose</key>
+				<false/>
 			</dict>
 		</array>
 	</dict>
 	<key>createdby</key>
-	<string>Sourcegraph</string>
+	<string>https://github.com/jklewa/sourcegraph-alfred</string>
 	<key>description</key>
 	<string>Sourcegraph Alfred Workflow</string>
 	<key>disabled</key>
@@ -33,6 +35,14 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
 				<key>argumenttype</key>
 				<integer>0</integer>
 				<key>escaping</key>
@@ -51,10 +61,14 @@
 				<string>Fetching Results...</string>
 				<key>script</key>
 				<string>python sourcegraph.py i "{query}"</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
 				<key>subtext</key>
-				<string>Try "http.get"</string>
+				<string>Try "http.Get"</string>
 				<key>title</key>
-				<string>sg &gt; Search for symbols, functions and definitions...</string>
+				<string>sg &gt; Code search in SourceGraph</string>
 				<key>type</key>
 				<integer>0</integer>
 				<key>withspace</key>
@@ -65,7 +79,7 @@
 			<key>uid</key>
 			<string>B7B7DA0B-84D0-4DC3-A7FA-153AFA3B7860</string>
 			<key>version</key>
-			<integer>0</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -75,7 +89,11 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>open "https://sourcegraph.com/{query}?utm_source=integration&amp;type=alfred"</string>
+				<string>open "${sourcegraph_url}{query}?utm_source=integration&amp;type=alfred"</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
 				<key>type</key>
 				<integer>0</integer>
 			</dict>
@@ -84,25 +102,42 @@
 			<key>uid</key>
 			<string>64F20F2B-A336-4CE8-8B23-36C9A5F9E68D</string>
 			<key>version</key>
-			<integer>0</integer>
+			<integer>2</integer>
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>Sourcegraph: https://sourcegraph.com/
+	<string>Sourcegraph: https://sourcegraph.com
 GitHub: https://github.com/jklewa/sourcegraph-alfred</string>
 	<key>uidata</key>
 	<dict>
 		<key>64F20F2B-A336-4CE8-8B23-36C9A5F9E68D</key>
 		<dict>
+			<key>xpos</key>
+			<integer>500</integer>
 			<key>ypos</key>
 			<real>120</real>
 		</dict>
 		<key>B7B7DA0B-84D0-4DC3-A7FA-153AFA3B7860</key>
 		<dict>
+			<key>xpos</key>
+			<integer>300</integer>
 			<key>ypos</key>
 			<real>120</real>
 		</dict>
 	</dict>
+	<key>variables</key>
+	<dict>
+		<key>api_token</key>
+		<string></string>
+		<key>sourcegraph_url</key>
+		<string>https://sourcegraph.com</string>
+	</dict>
+	<key>variablesdontexport</key>
+	<array>
+		<string>api_token</string>
+	</array>
+	<key>version</key>
+	<string>0.1.0</string>
 	<key>webaddress</key>
 	<string>http://sourcegraph.com</string>
 </dict>
