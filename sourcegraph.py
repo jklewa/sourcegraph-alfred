@@ -5,14 +5,6 @@ import sys
 import json
 from workflow import Workflow, web
 
-icon_mapping = {
-    "Java": "images/icons/java.png",
-    "C": "images/icons/c-original.png",
-    "Go": "images/icons/go-original.png",
-    "C#": "images/icons/csharp-original.png",
-    "Python": "images/icons/python-original.png"
-}
-
 
 def main(wf):
     try:
@@ -81,7 +73,7 @@ def main(wf):
                 if item['__typename'] in 'Repository' and repo_count < 5:
                     arg = item['url']
                     title = item['name']
-                    icon = "images/icons/doc-code.png"
+                    icon = "images/icons/git.png"
                     repo_count += 1
                     wf.add_item(title=title,
                                 arg=arg,
