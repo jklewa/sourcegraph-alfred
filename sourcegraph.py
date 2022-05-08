@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # encoding: utf-8
 
 import os
@@ -19,30 +20,34 @@ def main(wf):
 
         url = "{}/.api/graphql?SearchSuggestions".format(sourcegraph_url)
         body = """
-             query SearchSuggestions($query: String!) {
-                 search(query: $query) {
-                     suggestions(first: 20) {
-                         __typename
-                         ... on Repository {
-                             name
-                             url
-                         }
-                         ... on File {
-                             path
-                             url
-                             repository {
-                                 name
-                             }
-                         }
-                     }
-                 }
-             }
+            query SearchSuggestions($query: String!) {
+              search(query: $query) {
+                results {
+                  results {
+                    __typename
+                    ... on Repository {
+                      name
+                      url
+                    }
+                    ... on FileMatch {
+                      file{
+                        path
+                        url
+                      }
+                      repository {
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
          """
         variables = {
             'query': query
         }
         request = web.post(url,
-                           data=json.dumps({'query': body, 'variables': variables}),
+                           data=json.dumps({'query': body, 'variables': variables}).encode('utf-8'),
                            headers={'Authorization': 'token {}'.format(api_token)})
 
         # throw an error if request failed
@@ -53,14 +58,14 @@ def main(wf):
         result = request.json()
         # sys.stderr.write(json.dumps(result, indent=2))
         try:
-            suggestions = result['data']['search']['suggestions']
+            results = result['data']['search']['results']['results']
         except KeyError:
             sys.stderr.write(str(result['errors']))
             raise
 
         wf.clear_data()
 
-        if not suggestions:
+        if not results:
             wf.add_item(title="No results found for \"%s\"" % query,
                         subtitle="",
                         valid=False,
@@ -68,7 +73,7 @@ def main(wf):
             wf.send_feedback()
             return
         repo_count = file_count = 0
-        for item in suggestions:
+        for item in results:
             try:
                 if item['__typename'] in 'Repository' and repo_count < 5:
                     arg = item['url']
@@ -79,9 +84,9 @@ def main(wf):
                                 arg=arg,
                                 valid=True,
                                 icon=icon)
-                elif item['__typename'] in 'File' and file_count < 5:
-                    arg = item['url']
-                    title = item['path']
+                elif item['__typename'] in 'FileMatch' and file_count < 5:
+                    arg = item['file']['url']
+                    title = item['file']['path']
                     subtitle = 'from {}'.format(item['repository']['name'])
                     icon = "images/icons/doc-code.png"
                     file_count += 1
