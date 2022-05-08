@@ -60,7 +60,7 @@
 				<key>runningsubtext</key>
 				<string>Fetching Results...</string>
 				<key>script</key>
-				<string>python sourcegraph.py i "{query}"</string>
+				<string>./sourcegraph.py i "{query}"</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
@@ -95,7 +95,7 @@
 				<key>scriptfile</key>
 				<string></string>
 				<key>type</key>
-				<integer>0</integer>
+				<integer>5</integer>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.action.script</string>
@@ -137,7 +137,7 @@ GitHub: https://github.com/jklewa/sourcegraph-alfred</string>
 		<string>api_token</string>
 	</array>
 	<key>version</key>
-	<string>0.1.0</string>
+	<string>0.2.0</string>
 	<key>webaddress</key>
 	<string>http://sourcegraph.com</string>
 </dict>

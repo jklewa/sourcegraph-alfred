@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # encoding: utf-8
 #
 # Copyright (c) 2013 deanishe@deanishe.net.
@@ -166,15 +166,14 @@ def init_logging():
 
 def safename(name):
     """Make name filesystem and web-safe."""
-    if isinstance(name, str):
-        name = unicode(name, 'utf-8')
+    if isinstance(name, bytes):
+        name = name.decode('utf-8')
 
     # remove non-ASCII
     s = normalize('NFD', name)
-    b = s.encode('us-ascii', 'ignore')
 
     clean = []
-    for c in b:
+    for c in s:
         if c in OK_CHARS:
             clean.append(c)
         else:
@@ -219,18 +218,19 @@ def build_workflow(workflow_dir, outputdir, overwrite=False, verbose=False,
     with chdir(workflow_dir):
         # ------------------------------------------------------------
         # Read workflow metadata from info.plist
-        info = plistlib.readPlist(u'info.plist')
+        with open('info.plist', 'rb') as plist:
+            info = plistlib.load(plist)
         version = None
-        if not os.path.exists(u'info.plist'):
-            log.error(u'info.plist not found')
+        if not os.path.exists('info.plist'):
+            log.error('info.plist not found')
             return False
 
         if 'version' in info and info.get('version'):
             version = info['version']
 
         elif os.path.exists('version'):
-            with open('version') as fp:
-                version = fp.read().strip().decode('utf-8')
+            with open('version', 'r', encoding='utf-8') as fp:
+                version = fp.read().strip()
 
         name = safename(info['name'])
         zippath = os.path.join(outputdir, name)
@@ -263,7 +263,7 @@ def build_workflow(workflow_dir, outputdir, overwrite=False, verbose=False,
         # build workflow
         command = ['zip']
         if not verbose:
-            command.append(u'-q')
+            command.append('-q')
 
         command.append(zippath)
 
@@ -309,7 +309,7 @@ def main(args=None):
     workflow_dirs = [os.path.abspath(p) for p in args['<workflow-dir>']]
     verbose = log.level == logging.DEBUG
 
-    log.debug(u'outputdir=%r, workflow_dirs=%r', outputdir, workflow_dirs)
+    log.debug('outputdir=%r, workflow_dirs=%r', outputdir, workflow_dirs)
 
     # ------------------------------------------------------------
     # Build workflow(s)

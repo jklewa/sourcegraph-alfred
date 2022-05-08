@@ -30,4 +30,4 @@ Try some common searches:
 
 ## Support
 
-Sourcegraph for Alfred is compatible with Alfred version 4.
+Sourcegraph for Alfred is compatible with Alfred version 4 and Python 3.
