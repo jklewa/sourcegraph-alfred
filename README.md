@@ -1,4 +1,8 @@
 # Sourcegraph for Alfred 4 [ [Download Workflow](https://github.com/jklewa/sourcegraph-alfred/releases/latest) ]
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/jklewa/sourcegraph-alfred/total?logo=github)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jklewa/sourcegraph-alfred/master)
+![GitHub repo size](https://img.shields.io/github/repo-size/jklewa/sourcegraph-alfred)
+![GitHub Release](https://img.shields.io/github/v/release/jklewa/sourcegraph-alfred?include_prereleases)
 
 *Based on the archived [sourcegraph/sourcegraph-alfred](https://github.com/sourcegraph/sourcegraph-alfred) Feedback or issue? [File an issue.](https://github.com/jklewa/sourcegraph-alfred/issues)*
 
